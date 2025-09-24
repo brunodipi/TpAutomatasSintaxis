@@ -2,32 +2,45 @@
 #include <ctype.h>
 #include <string.h>
 
-/***************************************
- * ERRORES:
- * No acepta decimales sin signo
- * Los octales tienen que ser sin signo
-****************************************/
-
 //Los enteros decimales, base 10. En este ejemplo tambien se tomarian como validos los octales porque se acepta el 0 como primer caracter como algo valido
 //Estamos trabajando con alfabeto reducido
 typedef enum {
-    DECIMAL_OCTAL,
+    DECIMAL,
+    OCTAL,
     HEXADECIMAL,
     ERROR
 } Lenguaje;
 
-int columnaDecOct (char c){
+int columnaDec (char c){
     switch (c)
     {
-    case '+':
+    case '0':
         return 1;
         break;
 
-    case '-':
+    case '+':
         return 2;
+        break;
+
+    case '-':
+        return 3;
         break;
     
     default: //los numeros 0-9 se incluyen aca porque trabajamos con un alfabeto reducido
+        return 0;
+        break;
+    }
+
+}
+
+int columnaOct (char c){
+    switch (c)
+    {
+    case '0':
+        return 1;
+        break;
+    
+    default: //los numeros 0-7 se incluyen aca porque trabajamos con un alfabeto reducido
         return 0;
         break;
     }
@@ -55,45 +68,61 @@ int columnaHexa (char c){
 int verifica(char* cadena){ //al ser alfabeto reducido tenemos que hacer esta verificacion
     int i=0; //para ir avanzando la cadena, pasando por cada caracter
     int c = cadena[i]; // primer caracter a evaluar
-    
-    while(c != '\0' && (c == 'x' ||  isxdigit(c))) {
+    if(c == '0'){
+        c = 'P'; //P de Pifiaste, es hexa/octal, no hace falta analizar si es decimal porque no lo es
+    }
+    while(c != '\0' && (c == '+' || c == '-' || isdigit(c))) { 
         i++;
         c = cadena[i];
     }
 
     if (c == '\0')
-        return HEXADECIMAL;
+        return DECIMAL;
+
     else {
-        i=0; //para ir avanzando la cadena, pasando por cada caracter
-        c = cadena[i]; // primer caracter a evaluar
-        
-        while(c != '\0' && (c == '+' || c == '-' || isdigit(c))) {
+        int i=0; //para ir avanzando la cadena, pasando por cada caracter
+        int c = cadena[i]; // primer caracter a evaluar
+        while(c != '\0' && (c>='0' && c<='7')) {
             i++;
             c = cadena[i];
         }
 
         if (c == '\0')
-            return DECIMAL_OCTAL;
+            return OCTAL;
+        
+        else{
+            i=0; //para ir avanzando la cadena, pasando por cada caracter
+            c = cadena[i]; // primer caracter a evaluar
+            
+            while(c != '\0' && (c == 'x' ||  isxdigit(c))) {
+                i++;
+                c = cadena[i];
+            }
+
+            if (c == '\0')
+                return HEXADECIMAL;
+        }
     }
 
     return ERROR;
 }
 
-int esPalabraDecOct (char* cadena) { //recibir asi la cadena es como recibir un puntero al primer caracter de la cadena
+int esPalabraOct (char* cadena) { //recibir asi la cadena es como recibir un puntero al primer caracter de la cadena
     //la tabla estatica se carga solo 1 vez en memoria, es como una "var global"
-    static int tablaTransicion[4][3] = {
-        {2, 1, 1},
-        {2, 3, 3},
-        {2, 3, 3},
-        {3, 3, 3}
+    static int tablaTransicion[4][2] = {
+        {3, 1},
+        {2, 2},
+        {2, 2},
+        {3, 3}
 
     };
+
     int estado = 0; //lo inicializas como en el estado inicial
     int i=0; //para ir avanzando la cadena, pasando por cada caracter
     int c = cadena[i]; // primer caracter a evaluar
 
     while (c != '\0' && estado != 3){ // '\0' o el caracter centila que corresponda
-        estado = tablaTransicion[estado][columnaDecOct (c)];
+        estado = tablaTransicion[estado][columnaOct(c)];
         i++;
         c = cadena[i];
     }
@@ -103,6 +132,34 @@ int esPalabraDecOct (char* cadena) { //recibir asi la cadena es como recibir un 
 
     return 0;
 }
+
+
+int esPalabraDec (char* cadena) { //recibir asi la cadena es como recibir un puntero al primer caracter de la cadena
+    //la tabla estatica se carga solo 1 vez en memoria, es como una "var global"
+    static int tablaTransicion[4][4] = {
+        {2, 3, 1, 1},
+        {2, 3, 3, 3},
+        {2, 2, 3, 3},
+        {3, 3, 3, 3}
+
+    };
+
+    int estado = 0; //lo inicializas como en el estado inicial
+    int i=0; //para ir avanzando la cadena, pasando por cada caracter
+    int c = cadena[i]; // primer caracter a evaluar
+
+    while (c != '\0' && estado != 3){ // '\0' o el caracter centila que corresponda
+        estado = tablaTransicion[estado][columnaDec(c)];
+        i++;
+        c = cadena[i];
+    }
+    
+    if(estado == 2) //el estado de aceptacion, en este caso unico
+        return 1;
+
+    return 0;
+}
+
 
 int esPalabraHexa (char* cadena) { //recibir asi la cadena es como recibir un puntero al primer caracter de la cadena
     //la tabla estatica se carga solo 1 vez en memoria, es como una "var global"
@@ -138,23 +195,31 @@ int main () {
     char* cadena = strtok(cadenaCompleta, "#");
     while(cadena != NULL) {
         printf("Cadena evaluada: %s \n", cadena);
-        
+        int lenguaje = verifica(cadena);
 
-        Lenguaje lenguaje = verifica(cadena);
         switch(lenguaje){
-            case DECIMAL_OCTAL:
-                if(esPalabraDecOct(cadena)){
-                    printf("Es una palabra valida en Decimal u Octal \n");
+            case DECIMAL:
+                if(esPalabraDec(cadena)){
+                    printf("Es una palabra valida en Decimal \n");
                 }
                 else
-                printf("No es una palabra valida en Decimal u Octal y no cumple caracteres para Hexadecimal\n");
+                    printf("No es una palabra valida en Decimal y no cumple caracteres para Hexadecimal ni Octal\n");
                 break;
+
+            case OCTAL:
+                if(esPalabraOct(cadena)){
+                    printf("Es una palabra valida en Octal \n");
+                }
+                else
+                    printf("No es una palabra valida en Octal y no cumple caracteres para Hexadecimal ni Decimal\n");
+                break;
+
             case HEXADECIMAL:
                 if(esPalabraHexa(cadena)){
                     printf("Es una palabra valida en Hexadecimal \n");
                 }
                 else
-                    printf("No es una palabra valida en Hexadecimal y no cumple caracteres para Decimal u Octal\n");
+                    printf("No es una palabra valida en Hexadecimal y no cumple caracteres para Decimal ni Octal\n");
                 break;
             case ERROR:
                 printf("No verifica tener los caracteres validos para ningun lenguaje");
