@@ -186,48 +186,69 @@ int esPalabraHexa (char* cadena) { //recibir asi la cadena es como recibir un pu
     return 0;
 }
 
+void evaluar(char* cadena){
+    int lenguaje = verifica(cadena);
+    switch(lenguaje){
+        case DECIMAL:
+            if(esPalabraDec(cadena)){
+                printf("Es una palabra valida en Decimal \n");
+            }
+            else
+                printf("No es una palabra valida en Decimal y no cumple caracteres para Hexadecimal ni Octal\n");
+            break;
+
+        case OCTAL:
+            if(esPalabraOct(cadena)){
+                printf("Es una palabra valida en Octal \n");
+            }
+            else
+                printf("No es una palabra valida en Octal y no cumple caracteres para Hexadecimal ni Decimal\n");
+            break;
+
+        case HEXADECIMAL:
+            if(esPalabraHexa(cadena)){
+                printf("Es una palabra valida en Hexadecimal \n");
+            }
+            else
+                printf("No es una palabra valida en Hexadecimal y no cumple caracteres para Decimal ni Octal\n");
+            break;
+        case ERROR:
+            printf("No verifica tener los caracteres validos para ningun lenguaje");
+            break;      
+    }
+
+}
+
 int main () {
     char cadenaCompleta[100];
     
     printf("Ingrese la cadena a validar \n");
     scanf("%s",cadenaCompleta);
 
-    char* cadena = strtok(cadenaCompleta, "#");
-    while(cadena != NULL) {
-        printf("Cadena evaluada: %s \n", cadena);
-        int lenguaje = verifica(cadena);
+    //char* cadena = strtok(cadenaCompleta, "#");
+    char cadena[100];
+    int i = 0;
+    int j = 0;
 
-        switch(lenguaje){
-            case DECIMAL:
-                if(esPalabraDec(cadena)){
-                    printf("Es una palabra valida en Decimal \n");
-                }
-                else
-                    printf("No es una palabra valida en Decimal y no cumple caracteres para Hexadecimal ni Octal\n");
-                break;
+    while(1) {
+        char c = cadenaCompleta[i];
 
-            case OCTAL:
-                if(esPalabraOct(cadena)){
-                    printf("Es una palabra valida en Octal \n");
-                }
-                else
-                    printf("No es una palabra valida en Octal y no cumple caracteres para Hexadecimal ni Decimal\n");
-                break;
-
-            case HEXADECIMAL:
-                if(esPalabraHexa(cadena)){
-                    printf("Es una palabra valida en Hexadecimal \n");
-                }
-                else
-                    printf("No es una palabra valida en Hexadecimal y no cumple caracteres para Decimal ni Octal\n");
-                break;
-            case ERROR:
-                printf("No verifica tener los caracteres validos para ningun lenguaje");
-                break;      
+        if(c == '#') {
+            cadena[j] = '\0'; // para cerrar la palabra a analizar
+            printf("Cadena evaluada: %s \n", cadena);
+            evaluar(cadena); // Evalua todos los lenguajes
+            j = 0; // reinicia para proxima palabra
         }
-
-        cadena = strtok(NULL, "#"); // Arranca de donde dejo antes
-
+        else if(c == '\0') {
+            cadena[j] = '\0'; // para cerrar la palabra a analizar
+            printf("Cadena evaluada: %s \n", cadena);
+            evaluar(cadena); // Evalua todos los lenguajes
+            break; // es la ultima cadena a evaluar, corto el while
+        }
+        else {
+            cadena[j++] = c; // carga caracteres
+        }
+        i++;
     }
 
     return 0;
