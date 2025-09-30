@@ -1,1 +1,0 @@
-int caracterANumero(char caracter);

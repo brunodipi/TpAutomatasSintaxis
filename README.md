@@ -6,4 +6,4 @@
 - Isabella Mastrangelo (@isabellamastrangelo)
 - Lara Simes (@LaraSimes)
 
-### Comision K2102
+### Comision K2102, Grupo 14
