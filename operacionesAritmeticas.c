@@ -286,11 +286,44 @@ int resolverTermino(char* cadenaCompleta){
     return resultado;
 }
 
-int main(){
+ void ingresarCadena(char cadenaCompleta[]){
+    int opcion;
+    while(1){
+
+        printf("Como quiere ingresar la cadena?\n");
+        printf(" 1. Por terminal \n");
+        printf(" 2. Por archivo \n");
+        
+        if (scanf("%d", &opcion) != 1) { // Si scanf no pudo leer un número
+            printf("Entrada invalida. Intente de nuevo.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF); // limpiar buffer
+            continue; 
+        }
+        if(opcion == 1){
+            printf("Ingrese la cadena a validar \n");
+            scanf("%s",cadenaCompleta);
+            break;
+        }
+        else if(opcion == 2){
+            printf("Ingrese el nombre del archivo \n");
+            char archivo[100];
+            scanf("%s",archivo);
+            FILE* archivoCadena = fopen(archivo, "r");
+            fgets(cadenaCompleta, 100, archivoCadena);
+            fclose(archivoCadena);
+            break;
+        }
+        else {
+            printf("Opcion ingresada incorrecta (Opciones: 1 o 2)\n");
+            opcion == -1;
+        }
+    }
+}
+
+int main () {
     char cadenaCompleta[100];
-    
-    printf("Ingrese la cadena a calcular \n");
-    scanf("%s",cadenaCompleta);
+    ingresarCadena(cadenaCompleta);
 
     //char* cadena = strtok(cadenaCompleta, "#");
     char cadena[100];
