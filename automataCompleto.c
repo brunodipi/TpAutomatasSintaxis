@@ -185,12 +185,13 @@ int esPalabraHexa (char* cadena) { //recibir asi la cadena es como recibir un pu
     return 0;
 }
 
-void evaluar(char* cadena){
+void evaluar(char* cadena, int* cantDec, int* cantOct, int* cantHexa){
     int lenguaje = verifica(cadena);
     switch(lenguaje){
         case DECIMAL:
             if(esPalabraDec(cadena)){
                 printf("Es una palabra valida en Decimal \n");
+                (*cantDec)++;
             }
             else
                 printf("No es una palabra valida en Decimal y no cumple caracteres para Hexadecimal ni Octal\n");
@@ -199,6 +200,7 @@ void evaluar(char* cadena){
         case OCTAL:
             if(esPalabraOct(cadena)){
                 printf("Es una palabra valida en Octal \n");
+                (*cantOct)++;
             }
             else
                 printf("No es una palabra valida en Octal y no cumple caracteres para Hexadecimal ni Decimal\n");
@@ -207,6 +209,7 @@ void evaluar(char* cadena){
         case HEXADECIMAL:
             if(esPalabraHexa(cadena)){
                 printf("Es una palabra valida en Hexadecimal \n");
+                (*cantHexa)++;
             }
             else
                 printf("No es una palabra valida en Hexadecimal y no cumple caracteres para Decimal ni Octal\n");
@@ -226,7 +229,7 @@ void ingresarCadena(char cadenaCompleta[]){
         printf(" 1. Por terminal \n");
         printf(" 2. Por archivo \n");
         
-        if (scanf("%d", &opcion) != 1) { // Si scanf no pudo leer un número
+        if (scanf("%d", &opcion) != 1) { // si scanf no pudo leer un número
             printf("Entrada invalida. Intente de nuevo.\n");
             int ch;
             while ((ch = getchar()) != '\n' && ch != EOF); // limpiar buffer
@@ -263,7 +266,10 @@ int main () {
     char cadenaCompleta[100];
     ingresarCadena(cadenaCompleta);
 
-    //char* cadena = strtok(cadenaCompleta, "#");
+    int cantidadDecimal = 0;
+    int cantidadOctal = 0;
+    int cantidadHexa = 0;
+
     char cadena[100];
     int i = 0;
     int j = 0;
@@ -274,13 +280,13 @@ int main () {
         if(c == '#') {
             cadena[j] = '\0'; // para cerrar la palabra a analizar
             printf("Cadena evaluada: %s \n", cadena);
-            evaluar(cadena); // Evalua todos los lenguajes
+            evaluar(cadena, &cantidadDecimal, &cantidadOctal, &cantidadHexa); // Evalua todos los lenguajes
             j = 0; // reinicia para proxima palabra
         }
         else if(c == '\0') {
             cadena[j] = '\0'; // para cerrar la palabra a analizar
             printf("Cadena evaluada: %s \n", cadena);
-            evaluar(cadena); // Evalua todos los lenguajes
+            evaluar(cadena, &cantidadDecimal, &cantidadOctal, &cantidadHexa); // Evalua todos los lenguajes
             break; // es la ultima cadena a evaluar, corto el while
         }
         else {
@@ -288,6 +294,10 @@ int main () {
         }
         i++;
     }
+    printf("Cantidad de candenas evaluadas exitosamente:\n");
+    printf("Cantidad decimal: %d\n", cantidadDecimal);
+    printf("Cantidad octal: %d\n", cantidadOctal);
+    printf("Cantidad hexadecimal: %d\n", cantidadHexa);
 
     return 0;
 }
