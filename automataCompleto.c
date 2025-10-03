@@ -217,7 +217,8 @@ void evaluar(char* cadena){
     }
 
 }
- void ingresarCadena(char cadenaCompleta[]){
+
+void ingresarCadena(char cadenaCompleta[]){
     int opcion;
     while(1){
 
@@ -237,13 +238,19 @@ void evaluar(char* cadena){
             break;
         }
         else if(opcion == 2){
-            printf("Ingrese el nombre del archivo \n");
-            char archivo[100];
-            scanf("%s",archivo);
-            FILE* archivoCadena = fopen(archivo, "r");
-            fgets(cadenaCompleta, 100, archivoCadena);
-            fclose(archivoCadena);
-            break;
+            while(1){
+                printf("Ingrese el nombre del archivo \n");
+                char archivo[100];
+                scanf("%s",archivo);
+                FILE* archivoCadena = fopen(archivo, "r");
+                if(archivoCadena != NULL){
+                    fgets(cadenaCompleta, 100, archivoCadena);
+                    fclose(archivoCadena);
+                    return;
+                } else {
+                    printf("Archivo invalido: No se pudo abrir\n");
+                }
+            }
         }
         else {
             printf("Opcion ingresada incorrecta (Opciones: 1 o 2)\n");
